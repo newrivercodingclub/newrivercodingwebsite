@@ -18,8 +18,18 @@
 }
 .center {
   background-color: var(--deep-navy);
-  margin-left: 10px;
-  margin-right: 10px;
+  border-left: 10px solid;
+  border-right: 10px solid;
+  border-color: color-mix(
+    in oklab,
+    var(--baltic-blue) 50%,
+    var(--deep-navy) 50%
+  );
+}
+.center,
+.side {
+  padding-left: 10px;
+  padding-right: 10px;
 }
 .main1,
 .fullh {
@@ -32,7 +42,6 @@ body {
   .nav {
     a {
       font-weight: bold;
-      color: var(--celadon);
       padding: 10px;
       font-size: xx-large;
     }
@@ -42,10 +51,26 @@ body {
     margin-right: auto;
   }
   padding-bottom: 10px;
-  background-color: var(--deep-navy);
+  background-color: color-mix(
+    in oklab,
+    var(--baltic-blue) 50%,
+    var(--deep-navy) 50%
+  );
   width: 100vw;
 }
 p,
-strong {
+strong,
+h1,
+div {
+  color: var(--princeton-orange);
+}
+a {
   color: var(--celadon);
+  &:hover {
+    color: color-mix(
+      in oklab,
+      var(--celadon) 80%,
+      var(--deep-navy) 20%
+    );
+  }
 }
