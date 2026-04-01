@@ -1,8 +1,27 @@
-.row{
+:root {
+  --celadon: #afe3c0ff;
+  --wisteria: #b79cedff;
+  --princeton-orange: #ff8600ff;
+  --baltic-blue: #32639aff;
+  --deep-navy: #0b1d51ff;
+}
+.row {
   display: flex;
   flex-direction: row;
 }
-.col{
+.col {
   display: flex;
   flex-direction: column;
+}
+.side {
+  background-color: var(--baltic-blue);
+}
+.center {
+  background-color: var(--deep-navy);
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.main1 {
+  height: 100%;
+  margin: 0;
 }
