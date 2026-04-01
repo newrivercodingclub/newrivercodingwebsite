@@ -1,0 +1,12 @@
+@name dont break lines
+@file \.html$
+@regex (</?[\w-]+)\s*(\n)\s*>
+@replace $2$1>
+@endregex
+<a
+              href="https://newrivercoding.com/codejam"
+              >
+@name dont break lines
+@regex (</?[\w-]+)([^>]*?)(\n)([^>]*?)\s*>
+@replace $1$2>$3
+@endregex
