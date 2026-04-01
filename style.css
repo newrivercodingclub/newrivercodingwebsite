@@ -21,7 +21,10 @@
   margin-left: 10px;
   margin-right: 10px;
 }
-.main1 {
+.main1,
+.fullh {
   height: 100%;
-  margin: 0;
+}
+body {
+  padding: 0;
 }
