@@ -28,3 +28,24 @@
 body {
   padding: 0;
 }
+.navContainer {
+  .nav {
+    a {
+      font-weight: bold;
+      color: var(--celadon);
+      padding: 10px;
+      font-size: xx-large;
+    }
+    align-self: center;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  padding-bottom: 10px;
+  background-color: var(--deep-navy);
+  width: 100vw;
+}
+p,
+strong {
+  color: var(--celadon);
+}
