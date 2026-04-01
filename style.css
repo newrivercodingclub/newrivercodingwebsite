@@ -38,6 +38,7 @@ body {
   .main1 {
     .side {
       background-color: var(--baltic-blue);
+      width: max-content;
     }
     .center {
       background-color: var(--deep-navy);
