@@ -6,5 +6,5 @@
 
 @name dont break lines
 @regex (</?[\w-]+)([^>]*?)(\n)([^>]*?)\s*>
-@replace $1$2>$3
+@replace $3$1$2$4>$3
 @endregex

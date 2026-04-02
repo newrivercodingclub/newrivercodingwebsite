@@ -31,7 +31,9 @@ a {
 }
 body {
   padding: 0;
-  .main1,
+  .fullw {
+    width: 100%;
+  }
   .fullh {
     height: 100%;
   }
