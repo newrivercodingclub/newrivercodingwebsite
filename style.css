@@ -19,6 +19,9 @@ h1,
 div {
   color: var(--princeton-orange);
 }
+hr {
+  background-color: var(--wisteria);
+}
 a {
   color: var(--celadon);
   &:hover {
