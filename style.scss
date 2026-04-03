@@ -32,33 +32,34 @@ a {
     );
   }
 }
-.event {
-  border: 2px solid var(--wisteria);
-  padding: 4px;
-  .title {
-    font-weight: bold;
-    color: var(--celadon);
-  }
-  .desc {
-  }
-  smart-time {
-    a{
-      color: var(--wisteria);
-    }
-    .dt-range {
-      color: var(--wisteria);
-    }
-    .dt-duration {
-    }
-    .dt-separator {
-    }
-    .dt-relative {
-    }
-  }
-  .location {
-  }
-}
+
 body {
+  .event {
+    border: 2px solid var(--wisteria);
+    padding: 4px;
+    .title {
+      font-weight: bold;
+      color: var(--celadon);
+    }
+    .desc {
+    }
+    smart-time {
+      a {
+        color: var(--wisteria);
+      }
+      .dt-range {
+        color: var(--wisteria);
+      }
+      .dt-duration {
+      }
+      .dt-separator {
+      }
+      .dt-relative {
+      }
+    }
+    .location {
+    }
+  }
   padding: 0;
   .fullw {
     width: 100%;

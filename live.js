@@ -80,7 +80,7 @@ To monitor CSS and be notified that it has loaded, include it as: live.js#css,no
       if (active.html) uris.push(document.location.href)
 
       // track local css urls
-      for (var i = 0; i < links.length && active.css; i++) {
+      for (var i = 0; i < links.length && active.scss; i++) {
         var link = links[i],
           rel = link.getAttribute("rel"),
           href = link.getAttribute("href", 2)
@@ -121,7 +121,7 @@ To monitor CSS and be notified that it has loaded, include it as: live.js#css,no
       style.setAttribute("type", "text/css")
       head.appendChild(style)
       style.styleSheet ?
-        (style.styleSheet.cssText = css)
+        (style.styleSheet.scssText = css)
       : style.appendChild(document.createTextNode(css))
 
       // yep
@@ -209,7 +209,7 @@ To monitor CSS and be notified that it has loaded, include it as: live.js#css,no
             oldLink = oldLinkElements[url],
             html = document.body.parentNode,
             sheet = link.sheet || link.styleSheet,
-            rules = sheet.rules || sheet.cssRules
+            rules = sheet.rules || sheet.scssRules
           if (rules.length >= 0) {
             oldLink.parentNode.removeChild(oldLink)
             delete oldLinkElements[url]

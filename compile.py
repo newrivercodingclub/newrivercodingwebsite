@@ -27,7 +27,7 @@ IGNORED_DIRS = {"docs", "__pycache__", ".git", ".github", "node_modules"}
 
 # Static file extensions to copy from BASE_DIR → docs/
 STATIC_EXTS = {
-  ".css",
+  ".scss",
   ".js",
   ".ico",
   ".png",
@@ -165,7 +165,7 @@ def compile_all():
 
 
 def watch():
-  """Watch BASE_DIR for changes and recompile on any .html / .css / .js edit."""
+  """Watch BASE_DIR for changes and recompile on any .html / .scss / .js edit."""
   try:
     from watchdog.observers import Observer
     from watchdog.events import FileSystemEventHandler
@@ -185,7 +185,7 @@ def watch():
         return
       if src.suffix not in {
         ".html",
-        ".css",
+        ".scss",
         ".js",
         ".ico",
         ".png",
