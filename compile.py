@@ -54,6 +54,27 @@ def get_processed_html(current_folder: Path) -> str:
   return re.sub(r"\[(\w+)\]", replace_match, html_content)
 
 
+def rewrite_asset_paths(html: str, depth: int) -> str:
+  """
+  Rewrites root-relative asset URLs to relative paths so the site works
+  both on GitHub Pages (served under /repo-name/) and locally.
+
+  depth=0  →  docs/index.html          →  prefix "./"
+  depth=1  →  docs/About/index.html    →  prefix "../"
+  """
+  prefix = ("../" * depth) or "./"
+
+  def replace_url(match):
+    attr, path = match.group(1), match.group(2)
+    # Leave protocol-relative, external, or already-relative URLs alone
+    if path.startswith(("http", "//", ".")):
+      return match.group(0)
+    return f'{attr}="{prefix}{path.lstrip("/")}"'
+
+  # Match href="..." and src="..." that start with /
+  return re.sub(r'(href|src)="(/[^"]*)"', replace_url, html)
+
+
 def discover_routes() -> dict[str, Path]:
   """
   Returns a mapping of  output_path → source_folder  for every route.
@@ -107,7 +128,9 @@ def compile_all():
   for rel_out, src_folder in routes.items():
     out_path = OUTPUT_DIR / rel_out
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    html = get_processed_html(src_folder)
+    depth = len(Path(rel_out).parts) - 1   # index.html=0, About/index.html=1
+    html  = get_processed_html(src_folder)
+    html  = rewrite_asset_paths(html, depth)
     out_path.write_text(html, encoding="utf-8")
     label = src_folder.relative_to(BASE_DIR) if src_folder != DEFAULT_DIR else "About (default)"
     print(f"  ✔  {rel_out:<30}  ← {label}/")
