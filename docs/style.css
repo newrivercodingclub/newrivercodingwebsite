@@ -32,6 +32,21 @@ a {
     );
   }
 }
+.event {
+  border: 2px solid var(--wisteria);
+  padding: 4px;
+  .title {
+    font-weight: bold;
+    color: var(--celadon);
+  }
+  .desc {
+    
+  }
+  smart-time {
+  }
+  .location {
+  }
+}
 body {
   padding: 0;
   .fullw {
