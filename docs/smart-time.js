@@ -6,7 +6,7 @@ class SmartTime extends HTMLElement {
 
   // Monitor these attributes for changes
   static get observedAttributes() {
-    return ["time", "endtime"]
+    return ["time", "end-time", "endtime", "repeat"]
   }
 
   // If attributes change (or are set), re-render
@@ -24,10 +24,9 @@ class SmartTime extends HTMLElement {
   // Inside your SmartTime class, you can create this "universal" link:
   generateUniversalLink() {
     const start = this.getAttribute("time").replace(/[-:]/g, "")
-    const end =
-      this.getAttribute("end-time") ?
-        this.getAttribute("end-time").replace(/[-:]/g, "")
-      : start
+    const endAttr =
+      this.getAttribute("end-time") ?? this.getAttribute("endtime")
+    const end = endAttr ? endAttr.replace(/[-:]/g, "") : start
 
     // Minimal iCalendar file format
     const icsFile = [
@@ -43,6 +42,61 @@ class SmartTime extends HTMLElement {
 
     return `data:text/calendar;charset=utf8,${encodeURIComponent(icsFile)}`
   }
+  // Given a template Date and a repeat mode, returns the next occurrence >= now.
+  // The template's day-of-month (monthly) or day-of-week (weekly) and time-of-day
+  // are preserved; year/month are advanced as needed.
+  getNextOccurrence(template, repeat) {
+    const now = new Date()
+
+    if (repeat === "monthly") {
+      // Start from the same day/time this month
+      const candidate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        template.getDate(),
+        template.getHours(),
+        template.getMinutes(),
+        template.getSeconds(),
+      )
+      // If that moment has already passed, roll forward one month
+      if (candidate <= now) {
+        candidate.setMonth(candidate.getMonth() + 1)
+      }
+      return candidate
+    }
+
+    if (repeat === "weekly") {
+      const targetDay = template.getDay() // 0=Sun…6=Sat
+      const candidate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        template.getHours(),
+        template.getMinutes(),
+        template.getSeconds(),
+      )
+      const daysAhead = (targetDay - candidate.getDay() + 7) % 7
+      candidate.setDate(candidate.getDate() + daysAhead)
+      if (candidate <= now) candidate.setDate(candidate.getDate() + 7)
+      return candidate
+    }
+
+    if (repeat === "daily") {
+      const candidate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        template.getHours(),
+        template.getMinutes(),
+        template.getSeconds(),
+      )
+      if (candidate <= now) candidate.setDate(candidate.getDate() + 1)
+      return candidate
+    }
+
+    return template // no repeat, use as-is
+  }
+
   getTwoUnits(ms) {
     const totalSecs = Math.floor(Math.abs(ms) / 1000)
     const d = Math.floor(totalSecs / 86400)
@@ -63,8 +117,24 @@ class SmartTime extends HTMLElement {
     const startTimeAttr = this.getAttribute("time")
     if (!startTimeAttr) return
 
-    const startTime = new Date(startTimeAttr)
-    const endTimeAttr = this.getAttribute("endtime")
+    const repeat = this.getAttribute("repeat") || null
+    const templateStart = new Date(startTimeAttr)
+    const startTime =
+      repeat ?
+        this.getNextOccurrence(templateStart, repeat)
+      : templateStart
+
+    // Support both "endtime" and "end-time" attribute spellings
+    const endTimeAttr =
+      this.getAttribute("endtime") ?? this.getAttribute("end-time")
+    let endTime = null
+    if (endTimeAttr) {
+      // Preserve the original duration, applied to the resolved start
+      const templateEnd = new Date(endTimeAttr)
+      const durationMs = templateEnd - templateStart
+      endTime = new Date(startTime.getTime() + durationMs)
+    }
+
     const now = new Date()
 
     const dateFormatter = new Intl.DateTimeFormat(
@@ -82,8 +152,7 @@ class SmartTime extends HTMLElement {
     // 1. Formatting
     let displayString = ""
     let duration = ""
-    if (endTimeAttr) {
-      const endTime = new Date(endTimeAttr)
+    if (endTime) {
       displayString = dateFormatter.formatRange(startTime, endTime)
       duration += `(${this.getTwoUnits(endTime - startTime).text})`
     } else {
