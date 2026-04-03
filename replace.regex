@@ -11,6 +11,6 @@
 
 @name n
 @file 
-@regex –
+@regex –|—
 @replace -
 @endregex

@@ -1,25 +1,48 @@
 document.querySelectorAll("time").forEach((el) => {
-  // 1. Get the ISO string from the attribute
-  const time = new Date(el.getAttribute("time"))
+  const startTime = new Date(el.getAttribute("time"))
+  const now = new Date()
 
-  // 2. Format it using the user's locale settings
-  const formatter = new Intl.DateTimeFormat(navigator.language, {
-    weekday: "long", // "Thursday"
-    year: "numeric", // "2026"
-    month: "long", // "April"
-    day: "numeric", // "2"
-    hour: "numeric", // "11"
-    minute: "2-digit", // "51"
+  // 1. Standard Date/Range Formatting
+  const dateFormatter = new Intl.DateTimeFormat(navigator.language, {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
   })
+
+  let displayString = ""
 
   if (el.hasAttribute("endTime")) {
     const endTime = new Date(el.getAttribute("endTime"))
-    // formatRange automatically collapses shared parts:
-    // same day  → "Thursday, April 2, 2026, 11:00 AM - 1:00 PM"
-    // same hour → "Thursday, April 2, 2026, 11:00 - 11:45 AM"
-    // diff days → "Thursday, April 2 - Friday, April 3, 2026"
-    el.textContent = formatter.formatRange(time, endTime)
+    displayString = dateFormatter.formatRange(startTime, endTime)
+
+    // --- ADDING DURATION ---
+    const diffMs = endTime - startTime
+    const hours = Math.floor(diffMs / (1000 * 60 * 60))
+    const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+    displayString += ` (${hours}h ${mins}m)`
   } else {
-    el.textContent = formatter.format(time)
+    displayString = dateFormatter.format(startTime)
   }
+
+  // --- ADDING RELATIVE TIME (How long ago/until) ---
+  const relativeFormatter = new Intl.RelativeTimeFormat(
+    navigator.language,
+    { numeric: "auto" },
+  )
+
+  const diffInSeconds = Math.floor((startTime - now) / 1000)
+  const diffInDays = Math.floor(diffInSeconds / 86400)
+
+  let relativeText = ""
+  if (Math.abs(diffInDays) > 0) {
+    relativeText = relativeFormatter.format(diffInDays, "day")
+  } else {
+    const diffInHours = Math.floor(diffInSeconds / 3600)
+    relativeText = relativeFormatter.format(diffInHours, "hour")
+  }
+
+  el.textContent = `${displayString} - ${relativeText}`
 })
