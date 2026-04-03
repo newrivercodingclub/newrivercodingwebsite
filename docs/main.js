@@ -1,10 +1,50 @@
-const updateTimes = () => {
-  const now = new Date()
-  let nextUpdateDelay = 3600000 // Default to 1 hour
+class SmartTime extends HTMLElement {
+  constructor() {
+    super()
+    this._timer = null
+  }
 
-  document.querySelectorAll("time").forEach((el) => {
-    const startTime = new Date(el.getAttribute("time"))
-    const endTimeAttr = el.getAttribute("endTime")
+  // Monitor these attributes for changes
+  static get observedAttributes() {
+    return ["time", "endtime"]
+  }
+
+  // If attributes change (or are set), re-render
+  attributeChangedCallback() {
+    this.update()
+  }
+
+  connectedCallback() {
+    this.update()
+  }
+
+  disconnectedCallback() {
+    clearTimeout(this._timer)
+  }
+
+  getTwoUnits(ms) {
+    const totalSecs = Math.floor(Math.abs(ms) / 1000)
+    const d = Math.floor(totalSecs / 86400)
+    const h = Math.floor((totalSecs % 86400) / 3600)
+    const m = Math.floor((totalSecs % 3600) / 60)
+    const s = totalSecs % 60
+
+    if (d > 0)
+      return { text: `${d}d${h > 0 ? ` ${h}h` : ""}`, unit: "day" }
+    if (h > 0)
+      return { text: `${h}h${m > 0 ? ` ${m}m` : ""}`, unit: "hour" }
+    return { text: `${m}m${s > 0 ? ` ${s}s` : ""}`, unit: "minute" }
+  }
+
+  update() {
+    clearTimeout(this._timer)
+
+    const startTimeAttr = this.getAttribute("time")
+    if (!startTimeAttr) return
+
+    const startTime = new Date(startTimeAttr)
+    const endTimeAttr = this.getAttribute("endtime")
+    const now = new Date()
 
     const dateFormatter = new Intl.DateTimeFormat(
       navigator.language,
@@ -18,52 +58,33 @@ const updateTimes = () => {
       },
     )
 
-    const getTwoUnits = (ms) => {
-      const totalSecs = Math.floor(Math.abs(ms) / 1000)
-      const d = Math.floor(totalSecs / 86400)
-      const h = Math.floor((totalSecs % 86400) / 3600)
-      const m = Math.floor((totalSecs % 3600) / 60)
-      const s = totalSecs % 60
-
-      if (d > 0)
-        return { text: `${d}d${h > 0 ? ` ${h}h` : ""}`, unit: "day" }
-      if (h > 0)
-        return { text: `${h}h${m > 0 ? ` ${m}m` : ""}`, unit: "hour" }
-      return { text: `${m}m${s > 0 ? ` ${s}s` : ""}`, unit: "minute" }
-    }
-
-    // 1. Main Display
+    // 1. Formatting
     let displayString = ""
     if (endTimeAttr) {
       const endTime = new Date(endTimeAttr)
       displayString = dateFormatter.formatRange(startTime, endTime)
-      displayString += ` (${getTwoUnits(endTime - startTime).text})`
+      displayString += ` (${this.getTwoUnits(endTime - startTime).text})`
     } else {
       displayString = dateFormatter.format(startTime)
     }
 
-    // 2. Relative Time & Dynamic Delay Calculation
     const diffMs = startTime - now
     const isFuture = diffMs > 0
-    const relative = getTwoUnits(diffMs)
-
+    const relative = this.getTwoUnits(diffMs)
     const relativeText =
       isFuture ? `in ${relative.text}` : `${relative.text} ago`
-    el.textContent = `${displayString} - ${relativeText}`
 
-    // 3. Determine the shortest delay needed for this specific element
-    let currentDelay = 1000 // Default 1s if showing seconds
+    this.textContent = `${displayString} - ${relativeText}`
+
+    // 2. Schedule next update based on unit
+    let delay = 1000
     if (relative.unit === "hour")
-      currentDelay = 60000 * (60 - now.getMinutes()) // Sync to next hour
-    if (relative.unit === "day") currentDelay = 3600000 // Check every hour if showing days
+      delay = 60000 * (60 - now.getMinutes())
+    if (relative.unit === "day") delay = 3600000
 
-    // Keep the smallest delay found across all elements
-    nextUpdateDelay = Math.min(nextUpdateDelay, currentDelay)
-  })
-
-  // Schedule the next run
-  setTimeout(updateTimes, nextUpdateDelay)
+    this._timer = setTimeout(() => this.update(), delay)
+  }
 }
 
-// Initial call
-updateTimes()
+// Define the new element
+customElements.define("smart-time", SmartTime)

@@ -5,12 +5,12 @@
 @endregex
 
 @name dont break lines
-@regex (</?[\w-]+)([^>]*?)(\n)([^>]*?)\s*>
+@regex !!!(</?[\w-]+)([^>]*?)(\n)([^>]*?)\s*>
 @replace $3$1$2$4>$3
 @endregex
 
 @name n
-@file 
+@file \..*(?<!regex)$
 @regex –|—
 @replace -
 @endregex
