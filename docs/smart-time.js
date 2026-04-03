@@ -21,7 +21,28 @@ class SmartTime extends HTMLElement {
   disconnectedCallback() {
     clearTimeout(this._timer)
   }
+  // Inside your SmartTime class, you can create this "universal" link:
+  generateUniversalLink() {
+    const start = this.getAttribute("time").replace(/[-:]/g, "")
+    const end =
+      this.getAttribute("end-time") ?
+        this.getAttribute("end-time").replace(/[-:]/g, "")
+      : start
 
+    // Minimal iCalendar file format
+    const icsFile = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "BEGIN:VEVENT",
+      `DTSTART:${start}`,
+      `DTEND:${end}`,
+      "SUMMARY:Saved Event",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\n")
+
+    return `data:text/calendar;charset=utf8,${encodeURIComponent(icsFile)}`
+  }
   getTwoUnits(ms) {
     const totalSecs = Math.floor(Math.abs(ms) / 1000)
     const d = Math.floor(totalSecs / 86400)
@@ -75,12 +96,20 @@ class SmartTime extends HTMLElement {
     const relativeText =
       isFuture ? `in ${relative.text}` : `${relative.text} ago`
 
-    // Inside your Custom Element render()
+    var hasGeo =
+      this.hasAttribute("geo") && this.hasAttribute("geo-text")
     this.innerHTML = `
-        <span class="dt-range">${displayString}</span>
+        <a href="${this.generateUniversalLink()}"><span class="dt-range">${displayString}</span></a>
         ${duration ? `<span class="dt-duration">${duration}</span>` : ""}
         <span class="dt-separator"> - </span>
         <span class="dt-relative">${relativeText}</span>
+        ${
+          hasGeo ?
+            `<a href="geo:${this.getAttribute("geo")}">
+        <span class="dt-geo">${this.getAttribute("geo-text")}</span>
+        </a>`
+          : ""
+        }
       `
       .replace(/[\u2009\u00a0]/g, " ") // Replace Thin Space (&thinsp;) and Non-Breaking Space (&nbsp;)
       .replace(/[\u2013\u2014]/g, "-") // Normalize En-dash and Em-dash to a standard hyphen

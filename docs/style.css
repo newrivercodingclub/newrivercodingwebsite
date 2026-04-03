@@ -40,9 +40,20 @@ a {
     color: var(--celadon);
   }
   .desc {
-    
   }
   smart-time {
+    a{
+      color: var(--wisteria);
+    }
+    .dt-range {
+      color: var(--wisteria);
+    }
+    .dt-duration {
+    }
+    .dt-separator {
+    }
+    .dt-relative {
+    }
   }
   .location {
   }
