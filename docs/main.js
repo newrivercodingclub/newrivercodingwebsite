@@ -75,6 +75,9 @@ class SmartTime extends HTMLElement {
       isFuture ? `in ${relative.text}` : `${relative.text} ago`
 
     this.textContent = `${displayString} - ${relativeText}`
+      .replace(/[\u2009\u00a0]/g, " ") // Replace Thin Space (&thinsp;) and Non-Breaking Space (&nbsp;)
+      .replace(/[\u2013\u2014]/g, "-") // Normalize En-dash and Em-dash to a standard hyphen
+      .trim()
 
     // 2. Schedule next update based on unit
     let delay = 1000
