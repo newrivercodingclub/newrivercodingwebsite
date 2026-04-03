@@ -60,10 +60,11 @@ class SmartTime extends HTMLElement {
 
     // 1. Formatting
     let displayString = ""
+    let duration = ""
     if (endTimeAttr) {
       const endTime = new Date(endTimeAttr)
       displayString = dateFormatter.formatRange(startTime, endTime)
-      displayString += ` (${this.getTwoUnits(endTime - startTime).text})`
+      duration += `(${this.getTwoUnits(endTime - startTime).text})`
     } else {
       displayString = dateFormatter.format(startTime)
     }
@@ -74,7 +75,13 @@ class SmartTime extends HTMLElement {
     const relativeText =
       isFuture ? `in ${relative.text}` : `${relative.text} ago`
 
-    this.textContent = `${displayString} - ${relativeText}`
+    // Inside your Custom Element render()
+    this.innerHTML = `
+        <span class="dt-range">${displayString}</span>
+        ${duration ? `<span class="dt-duration">${duration}</span>` : ""}
+        <span class="dt-separator"> - </span>
+        <span class="dt-relative">${relativeText}</span>
+      `
       .replace(/[\u2009\u00a0]/g, " ") // Replace Thin Space (&thinsp;) and Non-Breaking Space (&nbsp;)
       .replace(/[\u2013\u2014]/g, "-") // Normalize En-dash and Em-dash to a standard hyphen
       .trim()
