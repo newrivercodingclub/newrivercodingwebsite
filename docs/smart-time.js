@@ -47,7 +47,6 @@ class SmartTime extends HTMLElement {
   // are preserved; year/month are advanced as needed.
   getNextOccurrence(template, repeat) {
     const now = new Date()
-    now.setDate(10)
 
     if (repeat === "monthly") {
       // Start from the same day/time this month
@@ -137,7 +136,6 @@ class SmartTime extends HTMLElement {
     }
 
     const now = new Date()
-    now.setDate(10)
 
     const dateFormatter = new Intl.DateTimeFormat(
       navigator.language,
