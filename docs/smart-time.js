@@ -47,6 +47,7 @@ class SmartTime extends HTMLElement {
   // are preserved; year/month are advanced as needed.
   getNextOccurrence(template, repeat) {
     const now = new Date()
+    now.setDate(10)
 
     if (repeat === "monthly") {
       // Start from the same day/time this month
@@ -136,6 +137,7 @@ class SmartTime extends HTMLElement {
     }
 
     const now = new Date()
+    now.setDate(10)
 
     const dateFormatter = new Intl.DateTimeFormat(
       navigator.language,
@@ -165,20 +167,11 @@ class SmartTime extends HTMLElement {
     const relativeText =
       isFuture ? `in ${relative.text}` : `${relative.text} ago`
 
-    var hasGeo =
-      this.hasAttribute("geo") && this.hasAttribute("geo-text")
     this.innerHTML = `
         <a href="${this.generateUniversalLink()}"><span class="dt-range">${displayString}</span></a>
         ${duration ? `<span class="dt-duration">${duration}</span>` : ""}
         <span class="dt-separator"> - </span>
         <span class="dt-relative">${relativeText}</span>
-        ${
-          hasGeo ?
-            `<a href="geo:${this.getAttribute("geo")}">
-        <span class="dt-geo">${this.getAttribute("geo-text")}</span>
-        </a>`
-          : ""
-        }
       `
       .replace(/[\u2009\u00a0]/g, " ") // Replace Thin Space (&thinsp;) and Non-Breaking Space (&nbsp;)
       .replace(/[\u2013\u2014]/g, "-") // Normalize En-dash and Em-dash to a standard hyphen
