@@ -42,9 +42,12 @@ smart-time {
   .dt-duration {
     color: var(--wisteria);
   }
-  .dt-separator {
+  .dt-separator,
+  .dt-grouping {
+    color: var(--celadon);
   }
   .dt-relative {
+    color: var(--wisteria);
   }
 }
 

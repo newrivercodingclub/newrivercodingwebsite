@@ -154,7 +154,7 @@ class SmartTime extends HTMLElement {
     let duration = ""
     if (endTime) {
       displayString = dateFormatter.formatRange(startTime, endTime)
-      duration += `(${this.getTwoUnits(endTime - startTime).text})`
+      duration = this.getTwoUnits(endTime - startTime).text
     } else {
       displayString = dateFormatter.format(startTime)
     }
@@ -163,11 +163,13 @@ class SmartTime extends HTMLElement {
     const isFuture = diffMs > 0
     const relative = this.getTwoUnits(diffMs)
     const relativeText =
-      isFuture ? `in ${relative.text}` : `${relative.text} ago`
+      isFuture ? `starts in ${relative.text}` : `started ${relative.text} ago`
 
     this.innerHTML = `
         <a href="${this.generateUniversalLink()}"><span class="dt-range">${displayString}</span></a>
+        <span class="dt-grouping">(</span>
         ${duration ? `<span class="dt-duration">${duration}</span>` : ""}
+        <span class="dt-grouping">)</span>
         <span class="dt-separator"> - </span>
         <span class="dt-relative">${relativeText}</span>
       `
