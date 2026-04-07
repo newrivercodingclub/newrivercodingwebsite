@@ -1,3 +1,4 @@
+Object.assign(globalThis, console)
 class SmartTime extends HTMLElement {
   constructor() {
     super()
@@ -161,22 +162,31 @@ class SmartTime extends HTMLElement {
     const diffMs = startTime - now
     const isFuture = diffMs > 0
     const relative = this.getTwoUnits(diffMs)
-    const relativeText =
-      isFuture ?
-        `starts in ${relative.text}`
-      : `started ${relative.text} ago`
-
-    this.innerHTML = `
-        <a href="${this.generateUniversalLink()}"><span class="dt-range">${displayString}</span></a>
-        <span class="dt-grouping">(</span>
-        ${duration ? `<span class="dt-duration">${duration}</span>` : ""}
-        <span class="dt-grouping">)</span>
-        <span class="dt-separator"> - </span>
-        <span class="dt-relative">${relativeText}</span>
-      `
-      .replace(/[\u2009\u00a0]/g, " ") // Replace Thin Space (&thinsp;) and Non-Breaking Space (&nbsp;)
-      .replace(/[\u2013\u2014]/g, "-") // Normalize En-dash and Em-dash to a standard hyphen
-      .trim()
+    this.replaceChildren(
+      ...[
+        newelem("a", { href: this.generateUniversalLink() }, [
+          newelem("span", { class: "dt-range" }, [displayString]),
+        ]),
+        newelem("span", { class: "dt-grouping" }, [" ("]),
+        duration ?
+          newelem("span", { class: "dt-duration" }, [duration])
+        : null,
+        newelem("span", { class: "dt-grouping" }, [")"]),
+        newelem("span", { class: "dt-separator" }, [" - "]),
+        newelem("span", { class: "dt-relative" }, [
+          newelem("span", {}, [
+            isFuture ? "starts in " : "started ",
+            newelem("span", { class: "dt-grouping" }, ["("]),
+            relative.text
+              .replace(/[\u2009\u00a0]/g, " ") // Replace Thin Space (&thinsp;) and Non-Breaking Space (&nbsp;)
+              .replace(/[\u2013\u2014]/g, "-") // Normalize En-dash and Em-dash to a standard hyphen
+              .trim(),
+            newelem("span", { class: "dt-grouping" }, [")"]),
+            isFuture ? "" : " ago",
+          ]),
+        ]),
+      ].filter(Boolean),
+    )
 
     // 2. Schedule next update based on unit
     let delay = 1000
