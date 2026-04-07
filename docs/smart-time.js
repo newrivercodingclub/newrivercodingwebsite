@@ -6,7 +6,7 @@ class SmartTime extends HTMLElement {
 
   // Monitor these attributes for changes
   static get observedAttributes() {
-    return ["time", "end-time", "endtime", "repeat"]
+    return ["time", "end-time", "repeat"]
   }
 
   // If attributes change (or are set), re-render
@@ -24,8 +24,7 @@ class SmartTime extends HTMLElement {
   // Inside your SmartTime class, you can create this "universal" link:
   generateUniversalLink() {
     const start = this.getAttribute("time").replace(/[-:]/g, "")
-    const endAttr =
-      this.getAttribute("end-time") ?? this.getAttribute("endtime")
+    const endAttr = this.getAttribute("end-time")
     const end = endAttr ? endAttr.replace(/[-:]/g, "") : start
 
     // Minimal iCalendar file format
@@ -163,7 +162,9 @@ class SmartTime extends HTMLElement {
     const isFuture = diffMs > 0
     const relative = this.getTwoUnits(diffMs)
     const relativeText =
-      isFuture ? `starts in ${relative.text}` : `started ${relative.text} ago`
+      isFuture ?
+        `starts in ${relative.text}`
+      : `started ${relative.text} ago`
 
     this.innerHTML = `
         <a href="${this.generateUniversalLink()}"><span class="dt-range">${displayString}</span></a>
