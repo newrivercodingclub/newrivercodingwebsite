@@ -1,4 +1,3 @@
-Object.assign(globalThis, console)
 class SmartTime extends HTMLElement {
   constructor() {
     super()
@@ -164,24 +163,24 @@ class SmartTime extends HTMLElement {
     const relative = this.getTwoUnits(diffMs)
     this.replaceChildren(
       ...[
-        newelem("a", { href: this.generateUniversalLink() }, [
-          newelem("span", { class: "dt-range" }, [displayString]),
+        a.newelem("a", { href: this.generateUniversalLink() }, [
+          a.newelem("span", { class: "dt-range" }, [displayString]),
         ]),
-        newelem("span", { class: "dt-grouping" }, [" ("]),
+        a.newelem("span", { class: "dt-grouping" }, [" ("]),
         duration ?
-          newelem("span", { class: "dt-duration" }, [duration])
+          a.newelem("span", { class: "dt-duration" }, [duration])
         : null,
-        newelem("span", { class: "dt-grouping" }, [")"]),
-        newelem("span", { class: "dt-separator" }, [" - "]),
-        newelem("span", { class: "dt-relative" }, [
-          newelem("span", {}, [
+        a.newelem("span", { class: "dt-grouping" }, [")"]),
+        a.newelem("span", { class: "dt-separator" }, [" - "]),
+        a.newelem("span", { class: "dt-relative" }, [
+          a.newelem("span", {}, [
             isFuture ? "starts in " : "started ",
-            newelem("span", { class: "dt-grouping" }, ["("]),
+            a.newelem("span", { class: "dt-grouping" }, ["("]),
             relative.text
               .replace(/[\u2009\u00a0]/g, " ") // Replace Thin Space (&thinsp;) and Non-Breaking Space (&nbsp;)
               .replace(/[\u2013\u2014]/g, "-") // Normalize En-dash and Em-dash to a standard hyphen
               .trim(),
-            newelem("span", { class: "dt-grouping" }, [")"]),
+            a.newelem("span", { class: "dt-grouping" }, [")"]),
             isFuture ? "" : " ago",
           ]),
         ]),
