@@ -2,13 +2,9 @@ Object.assign(globalThis, console)
 const a = loadlib("allfuncs")
 ;(async () => {
   await a.bodyload()
-  a.listen("#loadRpgGame", "click", (e) => {
+  a.listen(a.qsa(".iframeLoader"), "click", function (e) {
     e.preventDefault()
-    loadFrame("https://github.com/newrivercodingclub/CCGame")
-  })
-  a.listen("#loadCheckersGame", "click", (e) => {
-    e.preventDefault()
-    loadFrame("https://github.com/newrivercodingclub/Checkers")
+    loadFrame(this.dataset.url)
   })
   function loadFrame(url) {
     var c = a.qs(".center")
