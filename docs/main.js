@@ -2,13 +2,30 @@ Object.assign(globalThis, console)
 const a = loadlib("allfuncs")
 ;(async () => {
   await a.bodyload()
+  a.listen(window, "hashchange", function handleHashChange() {
+    const hash = location.hash
+
+    if (!hash) {
+      removeFrame()
+      return
+    }
+
+    const found = loaderMap[location.hash]
+
+    if (found) {
+      loadFrame(found.dataset.url)
+    } else {
+      removeFrame()
+    }
+  })
   var loaders = a.qsa(".iframeLoader")
+  const loaderMap = Object.fromEntries(
+    loaders.map((el) => [el.getAttribute("href"), el]),
+  )
+
   var startHTML = null
   var found = false
-  if (
-    location.hash &&
-    (found = loaders.find((e) => e.href == location.href))
-  ) {
+  if (location.hash && (found = loaderMap[location.hash])) {
     loadFrame(found.dataset.url)
   }
   a.listen(loaders, "click", function (e) {
@@ -19,16 +36,15 @@ const a = loadlib("allfuncs")
   }
   function loadFrame(url) {
     var c = a.qs(".center")
-    startHTML = c.innerHTML
+    startHTML ??= c.innerHTML
     c.innerHTML = ""
     c.appendChild(
       a.newelem(
         "div",
         {
-          class: "fullh fullw",
           marginTop: "10px",
           marginBottom: "10px",
-          class: "col",
+          class: "col full",
         },
         [
           a.newelem(
