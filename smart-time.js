@@ -21,11 +21,20 @@ class SmartTime extends HTMLElement {
   disconnectedCallback() {
     clearTimeout(this._timer)
   }
+  // Converts a Date to iCalendar UTC format: "20260107T183000Z"
+  toICalUTC(date) {
+    return date
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}/, "")
+  }
+
   // Inside your SmartTime class, you can create this "universal" link:
-  generateUniversalLink() {
-    const start = this.getAttribute("time").replace(/[-:]/g, "")
-    const endAttr = this.getAttribute("end-time")
-    const end = endAttr ? endAttr.replace(/[-:]/g, "") : start
+  // Accepts the already-resolved startTime and endTime Dates from update()
+  // so repeating events use the next occurrence, not the template date.
+  generateUniversalLink(startTime, endTime) {
+    const start = this.toICalUTC(startTime)
+    const end = this.toICalUTC(endTime ?? startTime)
 
     // Minimal iCalendar file format
     const icsFile = [
@@ -164,20 +173,24 @@ class SmartTime extends HTMLElement {
 
     this.replaceChildren(
       ...[
-        a.newelem("a", { href: this.generateUniversalLink() }, [
-          displayString.match(/[\d\w]+|[^\d\w]+/g).map((part) =>
-            a.newelem(
-              "span",
-              {
-                class:
-                  /^[\d\w]+$/.test(part) ? "dt-range" : (
-                    "dt-separator"
-                  ),
-              },
-              [part],
+        a.newelem(
+          "a",
+          { href: this.generateUniversalLink(startTime, endTime) },
+          [
+            displayString.match(/[\d\w]+|[^\d\w]+/g).map((part) =>
+              a.newelem(
+                "span",
+                {
+                  class:
+                    /^[\d\w]+$/.test(part) ? "dt-range" : (
+                      "dt-separator"
+                    ),
+                },
+                [part],
+              ),
             ),
-          ),
-        ]),
+          ],
+        ),
         a.newelem("span", { class: "dt-separator" }, [" ("]),
         duration ?
           a.newelem("span", { class: "dt-duration" }, [duration])
