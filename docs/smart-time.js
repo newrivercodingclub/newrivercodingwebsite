@@ -161,10 +161,22 @@ class SmartTime extends HTMLElement {
     const diffMs = startTime - now
     const isFuture = diffMs > 0
     const relative = this.getTwoUnits(diffMs)
+
     this.replaceChildren(
       ...[
         a.newelem("a", { href: this.generateUniversalLink() }, [
-          a.newelem("span", { class: "dt-range" }, [displayString]),
+          displayString.match(/[\d\w]+|[^\d\w]+/g).map((part) =>
+            a.newelem(
+              "span",
+              {
+                class:
+                  /^[\d\w]+$/.test(part) ? "dt-range" : (
+                    "dt-separator"
+                  ),
+              },
+              [part],
+            ),
+          ),
         ]),
         a.newelem("span", { class: "dt-separator" }, [" ("]),
         duration ?
