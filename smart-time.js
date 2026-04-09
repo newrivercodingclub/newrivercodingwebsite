@@ -166,21 +166,21 @@ class SmartTime extends HTMLElement {
         a.newelem("a", { href: this.generateUniversalLink() }, [
           a.newelem("span", { class: "dt-range" }, [displayString]),
         ]),
-        a.newelem("span", { class: "dt-grouping" }, [" ("]),
+        a.newelem("span", { class: "dt-separator" }, [" ("]),
         duration ?
           a.newelem("span", { class: "dt-duration" }, [duration])
         : null,
-        a.newelem("span", { class: "dt-grouping" }, [")"]),
+        a.newelem("span", { class: "dt-separator" }, [")"]),
         a.newelem("span", { class: "dt-separator" }, [" - "]),
         a.newelem("span", { class: "dt-relative" }, [
           a.newelem("span", {}, [
             isFuture ? "starts in " : "started ",
-            a.newelem("span", { class: "dt-grouping" }, ["("]),
+            a.newelem("span", { class: "dt-separator" }, ["("]),
             relative.text
               .replace(/[\u2009\u00a0]/g, " ") // Replace Thin Space (&thinsp;) and Non-Breaking Space (&nbsp;)
               .replace(/[\u2013\u2014]/g, "-") // Normalize En-dash and Em-dash to a standard hyphen
               .trim(),
-            a.newelem("span", { class: "dt-grouping" }, [")"]),
+            a.newelem("span", { class: "dt-separator" }, [")"]),
             isFuture ? "" : " ago",
           ]),
         ]),
