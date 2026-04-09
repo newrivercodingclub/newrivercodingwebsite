@@ -104,10 +104,10 @@ class SmartTime extends HTMLElement {
     const s = totalSecs % 60
 
     if (d > 0)
-      return { text: `${d}d${h > 0 ? ` ${h}h` : ""}`, unit: "day" }
+      return { text: `${d}d${h > 0 ? ` ${h}h` : ""}`, unit: "h" }
     if (h > 0)
-      return { text: `${h}h${m > 0 ? ` ${m}m` : ""}`, unit: "hour" }
-    return { text: `${m}m${s > 0 ? ` ${s}s` : ""}`, unit: "minute" }
+      return { text: `${h}h${m > 0 ? ` ${m}m` : ""}`, unit: "m" }
+    return { text: `${m}m${s > 0 ? ` ${s}s` : ""}`, unit: "s" }
   }
 
   update() {
@@ -200,11 +200,14 @@ class SmartTime extends HTMLElement {
     )
 
     // 2. Schedule next update based on unit
-    let delay = 1000
-    if (relative.unit === "hour")
-      delay = 60000 * (60 - now.getMinutes())
-    if (relative.unit === "day") delay = 3600000
+    let delay = {
+      s: 1000 - now.getMilliseconds(),
+      m: 1000 * (60 - now.getSeconds()),
+      h: 1000 * 60 * (60 - now.getMinutes()),
+      d: 1000 * 60 * 60 * (12 - now.getHours()),
+    }[relative.unit]
 
+    log(delay, relative.unit, relative)
     this._timer = setTimeout(() => this.update(), delay)
   }
 }
