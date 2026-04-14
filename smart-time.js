@@ -166,11 +166,34 @@ class SmartTime extends HTMLElement {
     } else {
       displayString = dateFormatter.format(startTime)
     }
-
+    log(displayString)
     const diffMs = startTime - now
     const isFuture = diffMs > 0
     const relative = this.getTwoUnits(diffMs)
+    let relativeStr = ""
+    let targetDiff = 0
+    let unitReference = "s"
 
+    if (now < startTime) {
+      // Future
+      const rel = this.getTwoUnits(startTime - now)
+      relativeStr = `starts in (${rel.text})`
+      targetDiff = startTime - now
+      unitReference = rel.unit
+    } else if (endTime && now < endTime) {
+      // Currently happening
+      const rel = this.getTwoUnits(endTime - now)
+      relativeStr = `ends in (${rel.text})`
+      targetDiff = endTime - now
+      unitReference = rel.unit
+    } else {
+      // Past (either past the start if no end, or past the end)
+      const compareTime = endTime || startTime
+      const rel = this.getTwoUnits(now - compareTime)
+      relativeStr = `ended (${rel.text}) ago`
+      targetDiff = now - compareTime
+      unitReference = rel.unit
+    }
     this.replaceChildren(
       ...[
         a.newelem(
@@ -191,22 +214,30 @@ class SmartTime extends HTMLElement {
             ),
           ],
         ),
-        a.newelem("span", { class: "dt-separator" }, [" ("]),
-        duration ?
-          a.newelem("span", { class: "dt-duration" }, [duration])
-        : null,
-        a.newelem("span", { class: "dt-separator" }, [")"]),
+        ...(duration ?
+          [
+            a.newelem("span", { class: "dt-separator" }, [" ("]),
+            a.newelem("span", { class: "dt-duration" }, [duration]),
+            a.newelem("span", { class: "dt-separator" }, [")"]),
+          ]
+        : []),
         a.newelem("span", { class: "dt-separator" }, [" - "]),
         a.newelem("span", { class: "dt-relative" }, [
           a.newelem("span", {}, [
-            isFuture ? "starts in " : "started ",
+            now < startTime ? "starts in "
+            : endTime && now < endTime ? "ends in "
+            : endTime ? "ended "
+            : "started ",
             a.newelem("span", { class: "dt-separator" }, ["("]),
             relative.text
               .replace(/[\u2009\u00a0]/g, " ") // Replace Thin Space (&thinsp;) and Non-Breaking Space (&nbsp;)
               .replace(/[\u2013\u2014]/g, "-") // Normalize En-dash and Em-dash to a standard hyphen
               .trim(),
             a.newelem("span", { class: "dt-separator" }, [")"]),
-            isFuture ? "" : " ago",
+            now < startTime ? ""
+            : endTime && now < endTime ? ""
+            : endTime ? " ago"
+            : " ago",
           ]),
         ]),
       ].filter(Boolean),
