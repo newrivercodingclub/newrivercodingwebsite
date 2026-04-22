@@ -167,7 +167,6 @@ class SmartTime extends HTMLElement {
     log(displayString)
     const diffMs = startTime - now
     const relative = this.getTwoUnits(diffMs)
-    let relativeStr = ""
     let targetDiff = 0
     let unitReference = "s"
     const timeText = { ON_TIME: 2, LATE: 1, EARLY: 3 }
@@ -176,7 +175,6 @@ class SmartTime extends HTMLElement {
     if (now < startTime) {
       // Future
       const rel = this.getTwoUnits(startTime - now)
-      relativeStr = `starts in (${rel.text})`
       targetDiff = startTime - now
       unitReference = rel.unit
       selectedTimeText = timeText.EARLY
@@ -186,7 +184,6 @@ class SmartTime extends HTMLElement {
       if (endTime && now < endTime) {
         // Currently happening
         const rel = this.getTwoUnits(endTime - now)
-        relativeStr = `ends in (${rel.text})`
         targetDiff = endTime - now
         unitReference = rel.unit
         selectedTimeText = timeText.ON_TIME
@@ -196,7 +193,6 @@ class SmartTime extends HTMLElement {
         // Past (either past the start if no end, or past the end)
         const compareTime = endTime || startTime
         const rel = this.getTwoUnits(now - compareTime)
-        relativeStr = `ended (${rel.text}) ago`
         targetDiff = now - compareTime
         unitReference = rel.unit
         selectedTimeText = timeText.LATE
@@ -235,7 +231,7 @@ class SmartTime extends HTMLElement {
             {
               [timeText.EARLY]: "starts in",
               [timeText.ON_TIME]: "ends in",
-              [timeText.LATE]: "started", //ended?
+              [timeText.LATE]: "ended", //ended?
             }[selectedTimeText] + " ",
             a.newelem("span", { class: "dt-separator" }, ["("]),
             relative.text
