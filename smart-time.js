@@ -167,34 +167,22 @@ class SmartTime extends HTMLElement {
     log(displayString)
     const diffMs = startTime - now
     const relative = this.getTwoUnits(diffMs)
-    let targetDiff = 0
-    let unitReference = "s"
     const timeText = { ON_TIME: 2, LATE: 1, EARLY: 3 }
     var selectedTimeText
     // now before start
     if (now < startTime) {
       // Future
-      const rel = this.getTwoUnits(startTime - now)
-      targetDiff = startTime - now
-      unitReference = rel.unit
       selectedTimeText = timeText.EARLY
     } else {
       // now after start
       // now bwfore end
       if (endTime && now < endTime) {
         // Currently happening
-        const rel = this.getTwoUnits(endTime - now)
-        targetDiff = endTime - now
-        unitReference = rel.unit
         selectedTimeText = timeText.ON_TIME
       } else {
         // now after start
         // now after end
         // Past (either past the start if no end, or past the end)
-        const compareTime = endTime || startTime
-        const rel = this.getTwoUnits(now - compareTime)
-        targetDiff = now - compareTime
-        unitReference = rel.unit
         selectedTimeText = timeText.LATE
       }
     }
