@@ -231,7 +231,7 @@ class SmartTime extends HTMLElement {
             {
               [timeText.EARLY]: "starts in",
               [timeText.ON_TIME]: "ends in",
-              [timeText.LATE]: "ended", //ended?
+              [timeText.LATE]: endTime ? "ended" : "started",
             }[selectedTimeText] + " ",
             a.newelem("span", { class: "dt-separator" }, ["("]),
             relative.text
