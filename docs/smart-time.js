@@ -132,9 +132,7 @@ class SmartTime extends HTMLElement {
         this.getNextOccurrence(templateStart, repeat)
       : templateStart
 
-    // Support both "endtime" and "end-time" attribute spellings
-    const endTimeAttr =
-      this.getAttribute("endtime") ?? this.getAttribute("end-time")
+    const endTimeAttr = this.getAttribute("end-time")
     let endTime = null
     if (endTimeAttr) {
       // Preserve the original duration, applied to the resolved start
@@ -168,31 +166,41 @@ class SmartTime extends HTMLElement {
     }
     log(displayString)
     const diffMs = startTime - now
-    const isFuture = diffMs > 0
     const relative = this.getTwoUnits(diffMs)
     let relativeStr = ""
     let targetDiff = 0
     let unitReference = "s"
-
+    const timeText = { ON_TIME: 2, LATE: 1, EARLY: 3 }
+    var selectedTimeText
+    // now before start
     if (now < startTime) {
       // Future
       const rel = this.getTwoUnits(startTime - now)
       relativeStr = `starts in (${rel.text})`
       targetDiff = startTime - now
       unitReference = rel.unit
-    } else if (endTime && now < endTime) {
-      // Currently happening
-      const rel = this.getTwoUnits(endTime - now)
-      relativeStr = `ends in (${rel.text})`
-      targetDiff = endTime - now
-      unitReference = rel.unit
+      selectedTimeText = timeText.EARLY
     } else {
-      // Past (either past the start if no end, or past the end)
-      const compareTime = endTime || startTime
-      const rel = this.getTwoUnits(now - compareTime)
-      relativeStr = `ended (${rel.text}) ago`
-      targetDiff = now - compareTime
-      unitReference = rel.unit
+      // now after start
+      // now bwfore end
+      if (endTime && now < endTime) {
+        // Currently happening
+        const rel = this.getTwoUnits(endTime - now)
+        relativeStr = `ends in (${rel.text})`
+        targetDiff = endTime - now
+        unitReference = rel.unit
+        selectedTimeText = timeText.ON_TIME
+      } else {
+        // now after start
+        // now after end
+        // Past (either past the start if no end, or past the end)
+        const compareTime = endTime || startTime
+        const rel = this.getTwoUnits(now - compareTime)
+        relativeStr = `ended (${rel.text}) ago`
+        targetDiff = now - compareTime
+        unitReference = rel.unit
+        selectedTimeText = timeText.LATE
+      }
     }
     this.replaceChildren(
       ...[
@@ -224,20 +232,22 @@ class SmartTime extends HTMLElement {
         a.newelem("span", { class: "dt-separator" }, [" - "]),
         a.newelem("span", { class: "dt-relative" }, [
           a.newelem("span", {}, [
-            now < startTime ? "starts in "
-            : endTime && now < endTime ? "ends in "
-            : endTime ? "ended "
-            : "started ",
+            {
+              [timeText.EARLY]: "starts in",
+              [timeText.ON_TIME]: "ends in",
+              [timeText.LATE]: "started", //ended?
+            }[selectedTimeText] + " ",
             a.newelem("span", { class: "dt-separator" }, ["("]),
             relative.text
               .replace(/[\u2009\u00a0]/g, " ") // Replace Thin Space (&thinsp;) and Non-Breaking Space (&nbsp;)
               .replace(/[\u2013\u2014]/g, "-") // Normalize En-dash and Em-dash to a standard hyphen
               .trim(),
             a.newelem("span", { class: "dt-separator" }, [")"]),
-            now < startTime ? ""
-            : endTime && now < endTime ? ""
-            : endTime ? " ago"
-            : " ago",
+            {
+              [timeText.EARLY]: "",
+              [timeText.ON_TIME]: "",
+              [timeText.LATE]: " ago",
+            }[selectedTimeText],
           ]),
         ]),
       ].filter(Boolean),
